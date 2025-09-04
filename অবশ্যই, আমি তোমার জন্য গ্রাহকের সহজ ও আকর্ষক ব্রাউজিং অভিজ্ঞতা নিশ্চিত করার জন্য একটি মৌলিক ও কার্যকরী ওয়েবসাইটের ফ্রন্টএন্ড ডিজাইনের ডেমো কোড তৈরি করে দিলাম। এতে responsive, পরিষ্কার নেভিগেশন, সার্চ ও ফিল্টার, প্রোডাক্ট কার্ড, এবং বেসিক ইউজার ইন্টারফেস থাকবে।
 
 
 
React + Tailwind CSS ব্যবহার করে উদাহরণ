@@ -1,0 +1,68 @@
+// App.jsx
+import React, { useState } from 'react';
+
+const productsData = [
+  { id: 1, name: 'প্রোডাক্ট ১', price: 1500, rating: 4.5, image: 'https://via.placeholder.com/150', category: 'ইলেকট্রনিকস' },
+  { id: 2, name: 'প্রোডাক্ট ২', price: 2500, rating: 4.0, image: 'https://via.placeholder.com/150', category: 'ক্লাথিং' },
+  { id: 3, name: 'প্রোডাক্ট ৩', price: 900, rating: 3.8, image: 'https://via.placeholder.com/150', category: 'ইলেকট্রনিকস' },
+  // আরো প্রোডাক্ট যোগ করতে পারো
+];
+
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+
+  // ফিল্টার করা প্রোডাক্ট
+  const filteredProducts = productsData.filter(product => {
+    const matchName = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchCategory = categoryFilter ? product.category === categoryFilter : true;
+    return matchName && matchCategory;
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <header className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-3 sm:mb-0">আমার ওয়েবশপ</h1>
+        <div className="flex space-x-3">
+          <input
+            type="text"
+            placeholder="প্রোডাক্ট খুঁজুন..."
+            className="border py-2 px-3 rounded w-64 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+          <select
+            className="border py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-600"
+            onChange={e => setCategoryFilter(e.target.value)}
+            value={categoryFilter}
+          >
+            <option value="">সব ক্যাটাগরি</option>
+            <option value="ইলেকট্রনিকস">ইলেকট্রনিকস</option>
+            <option value="ক্লাথিং">ক্লাথিং</option>
+          </select>
+        </div>
+      </header>
+
+      <main>
+        {filteredProducts.length === 0 ? (
+          <p className="text-gray-500 text-center mt-20">কোনো প্রোডাক্ট পাওয়া যায়নি।</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+function ProductCard({ product }) {
+  return (
+    <div className="bg-white rounded shadow p-4 hover:shadow-lg transition">
+      <img src={product.image} alt={product.name} className="w-full h-40 object-cover rounded mb-3" />
+      <h2 className="text-lg font-semibold mb-1">{product.name}</h2>
+      <p className="text-indigo-600 font-bold mb-1">৳{product.price}</p>
+      <RatingStars rating={product.rating} />
+      <button
