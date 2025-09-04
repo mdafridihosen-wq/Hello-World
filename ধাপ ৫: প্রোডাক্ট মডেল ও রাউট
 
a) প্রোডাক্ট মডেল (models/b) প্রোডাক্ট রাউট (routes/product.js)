@@ -1,0 +1,47 @@
+const express = require('express');
+const router = express.Router();
+const Product = require('../models/Product');
+
+// নতুন প্রোডাক্ট যুক্ত করা
+router.post('/', async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// সব প্রোডাক্ট দেখানো
+router.get('/', async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ক্যাটাগরি অনুসারে প্রোডাক্ট ফিল্টার
+router.get('/category/:category', async (req, res) => {
+  try {
+    const products = await Product.find({ category: req.params.category });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// প্রোডাক্ট সার্চ
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+  try {
+    const products = await Product.find({ name: { $regex: q, $options: 'i' } });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+module.exports = router;
